@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Kofax.Capture.CaptureModule.InteropServices;
 using System.IO;
 using System.Threading;
@@ -19,6 +17,8 @@ namespace fido_FastImportConnector.Model
         public string ImportRoot { get; set; }
         public string MoveToPath { get; set; }
         public string ImportFilePattern { get; set; }
+        public int Seconds { get; set; }
+        public bool ImportRunning { get; private set; }
         public Dictionary<string, string> BatchFields { get; set; }
         public Dictionary<string, string> IndexFields { get; set; }
 
@@ -41,13 +41,20 @@ namespace fido_FastImportConnector.Model
             ImportRoot = @"C:\";
             MoveToPath = @"C:\";
             ImportFilePattern = "*.tif";
+            Seconds = 0;
             BatchFields = new Dictionary<string, string>();
             IndexFields = new Dictionary<string, string>();
         }
-
+        
         private void Import(Object state)
         {
-
+            if (ImportRunning)
+            {
+                Console.WriteLine(String.Format("{0} import in progress, ignoring timer for now", DateTime.Now));
+                return;
+            }
+                
+            ImportRunning = true;
             IEnumerable<string> importFiles;
             int docCount, pageCount;
             
@@ -56,7 +63,7 @@ namespace fido_FastImportConnector.Model
 
             if (importFiles.Count() > 0)
             {
-
+                Console.WriteLine(String.Format("{0} {1} files found", DateTime.Now, importFiles.Count()));
                 login = new ImportLogin();
                 app = new Application();
                 g = Guid.NewGuid();
@@ -69,12 +76,20 @@ namespace fido_FastImportConnector.Model
                 }
                 catch (Exception e)
                 {
-                    throw e;
-                    //return String.Format("{0} Import failed ({1})", DateTime.Now, e.Message);
+                    Console.WriteLine(String.Format("{0} import failed: {1}", DateTime.Now, e.Message));
+                    ImportRunning = false;
+                    return;
                 }
-                
+
                 // make sure the batch class exists
-                if (!BatchClassExists(BatchClassName)) throw new Exception(String.Format("The Batch Class {0} was not found", BatchClassName)); //return string.Format("{0} The Batch Class {1} was not found", DateTime.Now, BatchClassName);
+                if (!BatchClassExists(BatchClassName))
+                {
+                    Console.WriteLine(String.Format("{0} the batch class {1} was not found", DateTime.Now, BatchClassName));
+                    ImportRunning = false;
+                    return;
+                    //throw new Exception(String.Format("The Batch Class {0} was not found", BatchClassName)); 
+                }
+
                 batchclass = app.BatchClasses[BatchClassName];
                 batch = app.CreateBatch(ref batchclass, g.ToString());
                 nulldocument = null;
@@ -88,6 +103,7 @@ namespace fido_FastImportConnector.Model
                     // now, we have loose pages
                     batch.ImportFile(f);
                     // create a document per attachment
+                    // note: if we wanted to create loose pages, we need to skip creating a document and moving pages to it entirely
                     document = batch.CreateDocument(ref nulldocument);
                     // then, move all loose pages to that document and assign the form type
                     foreach (Page p in batch.LoosePages)
@@ -95,10 +111,16 @@ namespace fido_FastImportConnector.Model
                         p.MoveToDocument(ref document, ref nullpage);
                     }
                     // if the form type exists, assign it. note that we won't throw an exception this time, but rather leave documents unassigned.
-                    if (FormTypeExists(FormTypeName)) document.FormType = batch.FormTypes[FormTypeName];
-                    
-                    // then, set index fields
-                    SetAllIndexFields();
+                    if (FormTypeExists(FormTypeName))
+                    {
+                        document.FormType = batch.FormTypes[FormTypeName];
+                        // then, set index fields
+                        SetAllIndexFields();
+                    }
+                    else
+                    {
+                        Console.WriteLine(String.Format("{0} form type {1} was not found", DateTime.Now, FormTypeName));
+                    }
 
                 }
 
@@ -108,7 +130,7 @@ namespace fido_FastImportConnector.Model
                 // close the batch to finalize its creation and logout
                 app.CloseBatch();
                 login.Logout();
-                //return String.Format("{0} Batch '{1}' successfully imported, {2} documents and {3} loose pages", DateTime.Now, g, docCount, pageCount);
+                Console.WriteLine(String.Format("{0} batch '{1}' successfully imported, {2} documents and {3} loose pages", DateTime.Now, g, docCount, pageCount));
 
                 // finally, we move the imported files to the MoveToPath location
                 Directory.CreateDirectory(this.MoveToPath);
@@ -117,11 +139,22 @@ namespace fido_FastImportConnector.Model
                     File.Move(f, Path.Combine(this.MoveToPath, Path.GetFileName(f)));
                 }
             }
+            else
+            {
+                Console.WriteLine(String.Format("{0} {1}", DateTime.Now, "no matching files found in import directory"));
+            }
+
+            ImportRunning = false;
         }
 
         public void StartTimedImport(int seconds)
         {
-            t = new Timer(this.Import, null, 0, seconds * 1000);
+            t = new Timer(Import, null, 0, seconds * 1000);
+        }
+
+        public void StartTimedImport()
+        {
+            StartTimedImport(Seconds);           
         }
 
         public void StopTimedImport()
@@ -134,7 +167,7 @@ namespace fido_FastImportConnector.Model
             Import(null);
         }
 
-        private Boolean BatchClassExists(string BatchClassName)
+        private bool BatchClassExists(string BatchClassName)
         {
             foreach (BatchClass b in app.BatchClasses)
             {
@@ -143,7 +176,7 @@ namespace fido_FastImportConnector.Model
             return false;
         }
 
-        private Boolean FormTypeExists(string FormTypeName)
+        private bool FormTypeExists(string FormTypeName)
         {
             foreach (FormType ft in batch.FormTypes)
             {
@@ -152,7 +185,7 @@ namespace fido_FastImportConnector.Model
             return false;
         }
 
-        private Boolean BatchFieldExists(string BatchFieldKey)
+        private bool BatchFieldExists(string BatchFieldKey)
         {
             foreach (BatchField bf in batch.BatchFields)
             {
@@ -164,7 +197,7 @@ namespace fido_FastImportConnector.Model
             return false;
         }
 
-        private Boolean IndexFieldExists(string IndexFieldKey)
+        private bool IndexFieldExists(string IndexFieldKey)
         {
             foreach (IndexField f in document.IndexFields)
             {
