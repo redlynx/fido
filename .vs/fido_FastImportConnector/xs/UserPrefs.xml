@@ -1,0 +1,17 @@
+﻿<Properties StartupConfiguration="{D14329D3-E9D6-4FE2-800A-D21D497D5672}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="fido_FastImportConnector/Model/KcImporter.cs">
+    <Files>
+      <File FileName="fido_FastImportConnector/SampleConfigs/fido_config_simple.json" Line="1" Column="1" />
+      <File FileName="fido_FastImportConnector/SampleConfigs/fido_config_test.json" Line="21" Column="1" />
+      <File FileName="fido_FastImportConnector/Program.cs" Line="1" Column="1" />
+      <File FileName="fido_FastImportConnector/Model/KcImporter.cs" Line="26" Column="9" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.ItemProperties.fido__FastImportConnector PreferredExecutionTarget="MonoDevelop.Default" />
+</Properties>

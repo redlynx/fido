@@ -1,0 +1,20 @@
+﻿{
+  "Username": "kfxservice",
+  "Password": "kfxservice",
+  "BatchClassName": "Test",
+  "FormTypeName": "Test",
+  "ImportDir": "C:\\ProgramData\\Kofax\\CaptureSV\\Projects\\import\\fido",
+  "TopDirectoryOnly": true,
+  "CreateDocumentPerFile": true,
+  "MoveToDir": "C:\\ProgramData\\Kofax\\CaptureSV\\Projects\\import\\fido\\done",
+  "ImportFilePattern": "*.*",
+  "Seconds": 10,
+  "BatchFields": {
+    "Fruit": "Banana"
+  },
+  "IndexFields": {
+    "Name0": "Jane",
+    "BC1": "42",
+    "BC2": "54"
+  }
+}

@@ -1,0 +1,18 @@
+﻿{
+  "Username": "admin",
+  "Password": "",
+  "BatchClassName": "Test",
+  "FormTypeName": "Test",
+  "ImportDir": "C:\\ProgramData\\Kofax\\CaptureSV\\Projects\\import\\fido",
+  "TopDirectoryOnly": true,
+  "CreateDocumentPerFile": true,
+  "MoveToDir": "C:\\ProgramData\\Kofax\\CaptureSV\\Projects\\import\\fido\\done",
+  "ImportFilePattern": "*.tif",
+  "Seconds": 10,
+  "BatchFields": {
+    "Fruit": "Banana"
+  },
+  "IndexFields": {
+    "Name0": "Jane"
+  }
+}

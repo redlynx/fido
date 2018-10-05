@@ -1,0 +1,14 @@
+﻿{
+  "Username": "admin",
+  "Password": "",
+  "BatchClassName": "Test",
+  "FormTypeName": "Test",
+  "ImportDir": "C:\\ProgramData\\Kofax\\CaptureSV\\Projects\\import\\fido",
+  "TopDirectoryOnly": true,
+  "CreateDocumentPerFile": true,
+  "MoveToDir": "C:\\ProgramData\\Kofax\\CaptureSV\\Projects\\import\\fido\\done",
+  "ImportFilePattern": "*.*",
+  "Seconds": 0,
+  "BatchFields": {},
+  "IndexFields": {}
+}
