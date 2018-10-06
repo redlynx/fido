@@ -2,10 +2,15 @@
 
 fido is two things: a lightweight importer for Kofax Capture that makes use of configuration files in JSON format, and a wrapper for the Kofax Import API.
 
-## Sample Usage
+## Sample Usage and Logging
 Just call fido with a configuration JSON as the single program argument:
 ```
 fido_FastImportConnector.exe fido_config_test.json
+```
+
+If you require a log, just redirect stdout:
+```
+fido_FastImportConnector.exe fido_config_test.json >> C:\fido.log
 ```
 
 ## Configuration Files
